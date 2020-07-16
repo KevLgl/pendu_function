@@ -1,49 +1,98 @@
-//alert("Bonjour et bienvenue, vous etes là pour jouer au jeu du pendu")
 
-function game(){
-    let life = 7;
-    let words = ["voiture", "moto", "velo", "piscine", "maison"];
-    let userLetter;
-    //Generate a random word from "words"
-    const randomWord = words[Math.floor(Math.random() * words.length)];
-    //Function for transforms random word into array 
-    function stringToArray(str){
-        return[...str]
-    };
-    //Creat userChoiceArray with the previous function 
-    let userChoiceArray = (stringToArray(randomWord));
-    //Creat the second array with maap, and crypted him
-    let userChoiceArrayCrypted = userChoiceArray.map(() => "_" );
-    //Ask the user for one letter and check her 
-        while(life !=0 || userChoiceArray != userChoiceArrayCrypted){
-            userLetter = prompt(`Votre mot a deviner est : ${userChoiceArrayCrypted}\nVeuillez entrer votre lettre\n\nTu as ${life} points de vie` );
-            while(userLetter.length >1 ||  isNaN(userLetter === false)){
-                userLetter = prompt(`Votre mot a deviner est : ${userChoiceArrayCrypted}\nVeuillez entrer votre lettre \n\nTu as ${life} points de vie` )
-            };
-            //Check if userLetter is into the random word 
-            //If she is into, return the index(s) on userIndexArray
-            if(userChoiceArray.includes(userLetter)){
-                userChoiceArray.forEach((lettre, index) => {
-                    if(userLetter === lettre){
-                        userChoiceArrayCrypted[index] = userChoiceArray[index]
-                        console.log(userChoiceArray.join(""))
-                        console.log(userChoiceArrayCrypted.join(""))
-                    }
-                });
-            }
-            // If it isn't on the random word, return sentence and loose 1 life point
-            else{
-                alert(`"${userLetter}" n'est pas dans le mot, desole `);
-                life --;
-            };
-        }
-        if(life === 0){
-            alert("tu as perdu cette partie")
-        };
-        if(userChoiceArray == userChoiceArrayCrypted){
-            alert("Tu as gagné, bien joué")
-        };
-        
+alert("Bienvenue dans le jeu du pendu !");
 
+// VARIABLES
+
+const regex = /[A-Z]/g;
+const WORDS = ["voiture", "moto", "velo", "piscine", "maison"];
+
+//-----------///////////////////////////////FONCTIONS///////////////////////////////////////////------------//
+
+// Jouer, regles, quitter
+function welcome() {
+    let startGame = prompt(`Entrez :\n (p) pour jouer \n (r) pour avoir les regles \n (q) pour quitter`);
+    if (startGame === "p") {
+        game();
+    } else if (startGame === "r") {
+        alert("Le but du jeu est simple : deviner toute les lettres qui doivent composer un mot, avec un nombre de chance limitée à 7 tentatives. A chaque fois que le joueur devine une lettre, celle-ci est affichée. Dans le cas contraire, le dessin d'un pendu se met à apparaître…");
+        welcome()
+    } else if (startGame === "q") {
+        alert(`bye`);
+    } else {
+        welcome()
+    }
 }
+//REPLAY
+function replay() {
+    let answerUser = prompt("Voulez vous rejouer ? (oui ou non)")
+    if(answerUser === "oui"){
+    game();
+    }
+    else{
+    alert("merci d'avoir joué, aurevoir")
+    }   
+}
+//Choose random word into WORDS
+function choiceRandomWord (){
+    let randomWord = Math.floor(Math.random() * Math.floor(WORDS.length));
+    return WORDS[randomWord];
+}
+
+// String to array with split method
+function splitRandomWordInArray(randomWord) {
+    let arrayWord = randomWord.split('');
+    return arrayWord;    
+}
+
+// Change all index on array with (_)
+function showHiddenLetter (randomWord){
+    let hiddenLetter = [];
+    for (let i = 0; i < randomWord.length; i++){
+        hiddenLetter[i] = " _ ";
+    }
+    return hiddenLetter;
+}
+
+// Chech the userValue (just one letter)
+function justOneLetter (oneLetter) {
+    while(oneLetter.length > 1 && oneLetter.match(regex)) {
+        oneLetter = prompt("Il faut rentrer une seule lettre !");
+    }
+    return oneLetter;
+}
+
+//----------/////////////////////////////////////////////////////////////////////////---------------//
+function game(){
+    let randomWord = choiceRandomWord(WORDS);
+    let arrayWord = splitRandomWordInArray(randomWord);
+    let hiddenLetter = showHiddenLetter(randomWord);
+    let wordInProgress = 0; //the word is find ?
+    let life = 7; //Life points
+
+
+    while(life > 0) {
+
+        let userChoice = justOneLetter(prompt(`Points de vie restants : ${life} \n\n${hiddenLetter}\n\nSaisis une lettre !`));
+        if (arrayWord.includes(userChoice))  {
+            for (var i = 0; i < arrayWord.length; i ++) {
+                if (userChoice.toLowerCase() === arrayWord[i]) {
+                    hiddenLetter[i] = userChoice.toLowerCase();
+                    wordInProgress ++;    
+                }
+            }
+        }
+        else {
+            life --;
+        }
+        if(wordInProgress === arrayWord.length){
+            alert("Félicitation tu as gagné !");
+            break
+        }
+        else if (life === 0) {
+            alert("Perdu !");
+        }
+    }
+    replay();
+}
+welcome();
 game();
